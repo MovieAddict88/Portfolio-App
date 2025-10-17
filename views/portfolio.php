@@ -15,15 +15,15 @@
     <meta name="msapplication-tap-highlight" content="no">
     
     <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="<?php echo SITE_URL; ?>/manifest.json">
     
     <!-- PWA Icons -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-72x72.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-72x72.png">
-    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png">
-    <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?php echo SITE_URL; ?>/icons/icon-72x72.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?php echo SITE_URL; ?>/icons/icon-72x72.png">
+    <link rel="apple-touch-icon" href="<?php echo SITE_URL; ?>/icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="<?php echo SITE_URL; ?>/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?php echo SITE_URL; ?>/icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="<?php echo SITE_URL; ?>/icons/icon-192x192.png">
     
     <!-- Preconnect to external domains for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
