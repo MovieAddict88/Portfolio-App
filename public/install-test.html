@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA Installation Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #1C2B4A 0%, #2c3e50 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #E2B714;
+        }
+        .status-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #E2B714;
+        }
+        .success { border-left-color: #4ade80; }
+        .error { border-left-color: #ff6b6b; }
+        .warning { border-left-color: #fbbf24; }
+        
+        button {
+            background: #E2B714;
+            color: #1C2B4A;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: white;
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .install-button {
+            background: #4ade80;
+            color: white;
+            font-size: 18px;
+            padding: 20px 40px;
+            display: block;
+            margin: 30px auto;
+        }
+        
+        .steps {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .step {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+        .step-number {
+            background: #E2B714;
+            color: #1C2B4A;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 PWA Installation Test</h1>
+        
+        <div class="status-box" id="https-status">
+            <h3>🔒 HTTPS Check</h3>
+            <p id="https-text">Checking...</p>
+        </div>
+        
+        <div class="status-box" id="manifest-status">
+            <h3>📋 Manifest Check</h3>
+            <p id="manifest-text">Checking...</p>
+        </div>
+        
+        <div class="status-box" id="sw-status">
+            <h3>⚙️ Service Worker Check</h3>
+            <p id="sw-text">Checking...</p>
+        </div>
+        
+        <div class="status-box" id="icons-status">
+            <h3>🎨 Icons Check</h3>
+            <p id="icons-text">Checking...</p>
+        </div>
+        
+        <button class="install-button" id="install-button" style="display: none;">
+            📱 Install Portfolio App
+        </button>
+        
+        <div class="steps">
+            <h3>📋 Installation Steps:</h3>
+            
+            <div class="step">
+                <span class="step-number">1</span>
+                <strong>Check Requirements:</strong> Make sure all status boxes above show green checkmarks
+            </div>
+            
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>Desktop (Chrome/Edge):</strong> Look for install button in address bar or click the install button above
+            </div>
+            
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>Mobile (Android):</strong> Open in Chrome → Menu (3 dots) → "Add to Home Screen"
+            </div>
+            
+            <div class="step">
+                <span class="step-number">4</span>
+                <strong>iOS (Safari):</strong> Share button → "Add to Home Screen"
+            </div>
+            
+            <div class="step">
+                <span class="step-number">5</span>
+                <strong>Test:</strong> Open the installed app and verify it works offline
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button onclick="runDiagnostics()">🔍 Run Full Diagnostics</button>
+            <button onclick="window.location.href='index.php'">🏠 Go to Portfolio</button>
+        </div>
+    </div>
+
+    <script>
+        let deferredPrompt;
+        
+        // Check HTTPS
+        function checkHTTPS() {
+            const isHTTPS = location.protocol === 'https:' || location.hostname === 'localhost';
+            const statusBox = document.getElementById('https-status');
+            const text = document.getElementById('https-text');
+            
+            if (isHTTPS) {
+                statusBox.className = 'status-box success';
+                text.innerHTML = '✅ HTTPS is enabled - PWA installation will work';
+            } else {
+                statusBox.className = 'status-box error';
+                text.innerHTML = '❌ HTTPS required for PWA installation. Please use HTTPS or localhost';
+            }
+        }
+        
+        // Check Manifest
+        async function checkManifest() {
+            const statusBox = document.getElementById('manifest-status');
+            const text = document.getElementById('manifest-text');
+            
+            try {
+                const response = await fetch('./manifest.json');
+                if (response.ok) {
+                    const manifest = await response.json();
+                    statusBox.className = 'status-box success';
+                    text.innerHTML = `✅ Manifest loaded successfully<br>
+                        <small>Name: ${manifest.name}<br>
+                        Icons: ${manifest.icons ? manifest.icons.length : 0} icons</small>`;
+                } else {
+                    statusBox.className = 'status-box error';
+                    text.innerHTML = '❌ Manifest not found or not accessible';
+                }
+            } catch (error) {
+                statusBox.className = 'status-box error';
+                text.innerHTML = `❌ Error loading manifest: ${error.message}`;
+            }
+        }
+        
+        // Check Service Worker
+        async function checkServiceWorker() {
+            const statusBox = document.getElementById('sw-status');
+            const text = document.getElementById('sw-text');
+            
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.getRegistration();
+                    if (registration) {
+                        statusBox.className = 'status-box success';
+                        text.innerHTML = '✅ Service Worker is registered and active';
+                    } else {
+                        statusBox.className = 'status-box warning';
+                        text.innerHTML = '⚠️ Service Worker not registered. Trying to register...';
+                        
+                        // Try to register
+                        try {
+                            await navigator.serviceWorker.register('./sw.js');
+                            text.innerHTML = '✅ Service Worker registered successfully';
+                            statusBox.className = 'status-box success';
+                        } catch (error) {
+                            text.innerHTML = `❌ Failed to register Service Worker: ${error.message}`;
+                            statusBox.className = 'status-box error';
+                        }
+                    }
+                } catch (error) {
+                    statusBox.className = 'status-box error';
+                    text.innerHTML = `❌ Error checking Service Worker: ${error.message}`;
+                }
+            } else {
+                statusBox.className = 'status-box error';
+                text.innerHTML = '❌ Service Worker not supported in this browser';
+            }
+        }
+        
+        // Check Icons
+        async function checkIcons() {
+            const statusBox = document.getElementById('icons-status');
+            const text = document.getElementById('icons-text');
+            
+            const requiredIcons = [
+                './icons/icon-72x72.png',
+                './icons/icon-192x192.png',
+                './icons/icon-512x512.png'
+            ];
+            
+            let foundIcons = 0;
+            let missingIcons = [];
+            
+            for (const icon of requiredIcons) {
+                try {
+                    const response = await fetch(icon);
+                    if (response.ok) {
+                        foundIcons++;
+                    } else {
+                        missingIcons.push(icon);
+                    }
+                } catch (error) {
+                    missingIcons.push(icon);
+                }
+            }
+            
+            if (foundIcons === requiredIcons.length) {
+                statusBox.className = 'status-box success';
+                text.innerHTML = `✅ All required icons found (${foundIcons}/${requiredIcons.length})`;
+            } else {
+                statusBox.className = 'status-box error';
+                text.innerHTML = `❌ Missing icons: ${missingIcons.join(', ')}`;
+            }
+        }
+        
+        // Install button functionality
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('install-button').style.display = 'block';
+        });
+        
+        document.getElementById('install-button').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the install prompt: ${outcome}`);
+                deferredPrompt = null;
+                document.getElementById('install-button').style.display = 'none';
+            }
+        });
+        
+        // Run all checks
+        async function runDiagnostics() {
+            checkHTTPS();
+            await checkManifest();
+            await checkServiceWorker();
+            await checkIcons();
+        }
+        
+        // Run checks on page load
+        window.addEventListener('load', runDiagnostics);
+        
+        // Check if already installed
+        window.addEventListener('appinstalled', () => {
+            alert('🎉 Portfolio app installed successfully!');
+        });
+    </script>
+</body>
+</html>
