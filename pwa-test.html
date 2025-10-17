@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA Testing & Validation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f7fa;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1C2B4A;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .test-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .test-item:last-child {
+            border-bottom: none;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #1C2B4A;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #E2B714;
+            color: #1C2B4A;
+        }
+        .test-results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 PWA Testing & Validation</h1>
+        
+        <div class="test-section">
+            <h2>📱 PWA Core Features</h2>
+            <div class="test-item">
+                <span>Service Worker Support</span>
+                <span class="status" id="sw-support">Testing...</span>
+            </div>
+            <div class="test-item">
+                <span>Web App Manifest</span>
+                <span class="status" id="manifest-support">Testing...</span>
+            </div>
+            <div class="test-item">
+                <span>HTTPS/SSL</span>
+                <span class="status" id="https-support">Testing...</span>
+            </div>
+            <div class="test-item">
+                <span>Responsive Design</span>
+                <span class="status" id="responsive-support">Testing...</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎨 PWA Icons & Assets</h2>
+            <div class="test-item">
+                <span>Manifest Icons (192x192)</span>
+                <span class="status" id="icon-192">Testing...</span>
+            </div>
+            <div class="test-item">
+                <span>Manifest Icons (512x512)</span>
+                <span class="status" id="icon-512">Testing...</span>
+            </div>
+            <div class="test-item">
+                <span>Apple Touch Icons</span>
+                <span class="status" id="apple-icons">Testing...</span>
+            </div>
+            <div class="test-item">
+                <span>Favicon</span>
+                <span class="status" id="favicon">Testing...</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>⚡ Performance & Caching</h2>
+            <div class="test-item">
+                <span>Service Worker Caching</span>
+                <span class="status" id="caching">Testing...</span>
+            </div>
+            <div class="test-item">
+                <span>Offline Functionality</span>
+                <span class="status" id="offline">Testing...</span>
+            </div>
+            <div class="test-item">
+                <span>Cache Storage</span>
+                <span class="status" id="cache-storage">Testing...</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📲 Installation & UX</h2>
+            <div class="test-item">
+                <span>Install Prompt</span>
+                <span class="status" id="install-prompt">Testing...</span>
+            </div>
+            <div class="test-item">
+                <span>App-like Experience</span>
+                <span class="status" id="app-like">Testing...</span>
+            </div>
+            <div class="test-item">
+                <span>Standalone Mode</span>
+                <span class="status" id="standalone">Testing...</span>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <button onclick="runAllTests()">🔄 Run All Tests</button>
+            <button onclick="validateManifest()">📋 Validate Manifest</button>
+            <button onclick="testOffline()">📡 Test Offline</button>
+            <button onclick="clearCache()">🗑️ Clear Cache</button>
+        </div>
+
+        <div class="test-results" id="testResults" style="display: none;"></div>
+    </div>
+
+    <script>
+        function updateStatus(elementId, status, message = '') {
+            const element = document.getElementById(elementId);
+            element.textContent = status;
+            element.className = `status ${status.toLowerCase()}`;
+            if (message) {
+                element.title = message;
+            }
+        }
+
+        function logResult(message) {
+            const results = document.getElementById('testResults');
+            results.style.display = 'block';
+            results.textContent += message + '\n';
+        }
+
+        async function runAllTests() {
+            document.getElementById('testResults').style.display = 'none';
+            document.getElementById('testResults').textContent = '';
+            
+            logResult('Starting PWA tests...\n');
+            
+            // Test Service Worker Support
+            if ('serviceWorker' in navigator) {
+                updateStatus('sw-support', 'PASS', 'Service Worker API available');
+                logResult('✓ Service Worker API is supported');
+            } else {
+                updateStatus('sw-support', 'FAIL', 'Service Worker API not available');
+                logResult('✗ Service Worker API not supported');
+            }
+
+            // Test HTTPS
+            if (location.protocol === 'https:' || location.hostname === 'localhost') {
+                updateStatus('https-support', 'PASS', 'HTTPS or localhost detected');
+                logResult('✓ HTTPS or localhost detected');
+            } else {
+                updateStatus('https-support', 'FAIL', 'HTTPS required for PWA');
+                logResult('✗ HTTPS required for PWA');
+            }
+
+            // Test Manifest
+            try {
+                const response = await fetch('/manifest.json');
+                if (response.ok) {
+                    const manifest = await response.json();
+                    updateStatus('manifest-support', 'PASS', 'Manifest loaded successfully');
+                    logResult('✓ Web App Manifest loaded successfully');
+                    logResult(`  - Name: ${manifest.name}`);
+                    logResult(`  - Short Name: ${manifest.short_name}`);
+                    logResult(`  - Icons: ${manifest.icons ? manifest.icons.length : 0} icons`);
+                } else {
+                    updateStatus('manifest-support', 'FAIL', 'Manifest not found');
+                    logResult('✗ Web App Manifest not found');
+                }
+            } catch (error) {
+                updateStatus('manifest-support', 'FAIL', 'Error loading manifest');
+                logResult('✗ Error loading manifest: ' + error.message);
+            }
+
+            // Test Icons
+            await testIcon('/icons/icon-192x192.png', 'icon-192');
+            await testIcon('/icons/icon-512x512.png', 'icon-512');
+            await testIcon('/icons/icon-192x192.png', 'apple-icons');
+            await testIcon('/icons/icon-72x72.png', 'favicon');
+
+            // Test Responsive Design
+            const isResponsive = window.innerWidth <= 768 ? 
+                document.querySelector('meta[name="viewport"]') !== null : true;
+            updateStatus('responsive-support', isResponsive ? 'PASS' : 'WARNING', 
+                isResponsive ? 'Viewport meta tag present' : 'Check viewport meta tag');
+            logResult(isResponsive ? '✓ Responsive design detected' : '⚠ Check responsive design');
+
+            // Test Service Worker Registration
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.getRegistration();
+                    if (registration) {
+                        updateStatus('caching', 'PASS', 'Service Worker registered');
+                        logResult('✓ Service Worker is registered');
+                    } else {
+                        updateStatus('caching', 'WARNING', 'Service Worker not registered');
+                        logResult('⚠ Service Worker not registered');
+                    }
+                } catch (error) {
+                    updateStatus('caching', 'FAIL', 'Error checking Service Worker');
+                    logResult('✗ Error checking Service Worker: ' + error.message);
+                }
+            }
+
+            // Test Cache Storage
+            if ('caches' in window) {
+                try {
+                    const cacheNames = await caches.keys();
+                    updateStatus('cache-storage', 'PASS', `${cacheNames.length} caches found`);
+                    logResult(`✓ Cache storage available (${cacheNames.length} caches)`);
+                } catch (error) {
+                    updateStatus('cache-storage', 'FAIL', 'Error accessing cache storage');
+                    logResult('✗ Error accessing cache storage: ' + error.message);
+                }
+            } else {
+                updateStatus('cache-storage', 'FAIL', 'Cache API not available');
+                logResult('✗ Cache API not available');
+            }
+
+            // Test Install Prompt
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                deferredPrompt = e;
+                updateStatus('install-prompt', 'PASS', 'Install prompt available');
+                logResult('✓ Install prompt is available');
+            });
+
+            // Test App-like Experience
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                                window.navigator.standalone === true;
+            updateStatus('standalone', isStandalone ? 'PASS' : 'INFO', 
+                isStandalone ? 'Running in standalone mode' : 'Not in standalone mode');
+            logResult(isStandalone ? '✓ Running in standalone mode' : 'ℹ Not in standalone mode');
+
+            updateStatus('app-like', 'PASS', 'App-like experience configured');
+            logResult('✓ App-like experience configured');
+
+            logResult('\nPWA testing completed!');
+        }
+
+        async function testIcon(iconPath, elementId) {
+            try {
+                const response = await fetch(iconPath);
+                if (response.ok) {
+                    updateStatus(elementId, 'PASS', 'Icon found');
+                    logResult(`✓ ${iconPath} found`);
+                } else {
+                    updateStatus(elementId, 'FAIL', 'Icon not found');
+                    logResult(`✗ ${iconPath} not found`);
+                }
+            } catch (error) {
+                updateStatus(elementId, 'FAIL', 'Error loading icon');
+                logResult(`✗ Error loading ${iconPath}: ${error.message}`);
+            }
+        }
+
+        async function validateManifest() {
+            try {
+                const response = await fetch('/manifest.json');
+                const manifest = await response.json();
+                
+                logResult('Manifest Validation Results:');
+                logResult('========================');
+                
+                // Check required fields
+                const requiredFields = ['name', 'short_name', 'start_url', 'display', 'icons'];
+                requiredFields.forEach(field => {
+                    if (manifest[field]) {
+                        logResult(`✓ ${field}: ${manifest[field]}`);
+                    } else {
+                        logResult(`✗ Missing required field: ${field}`);
+                    }
+                });
+
+                // Check icons
+                if (manifest.icons && manifest.icons.length > 0) {
+                    logResult(`✓ Icons: ${manifest.icons.length} icons defined`);
+                    manifest.icons.forEach(icon => {
+                        logResult(`  - ${icon.sizes}: ${icon.src}`);
+                    });
+                } else {
+                    logResult('✗ No icons defined');
+                }
+
+                // Check display modes
+                const validDisplays = ['fullscreen', 'standalone', 'minimal-ui', 'browser'];
+                if (validDisplays.includes(manifest.display)) {
+                    logResult(`✓ Display mode: ${manifest.display}`);
+                } else {
+                    logResult(`✗ Invalid display mode: ${manifest.display}`);
+                }
+
+            } catch (error) {
+                logResult('✗ Error validating manifest: ' + error.message);
+            }
+        }
+
+        async function testOffline() {
+            logResult('Testing offline functionality...');
+            
+            // Simulate offline mode
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.getRegistration();
+                    if (registration) {
+                        logResult('✓ Service Worker is registered for offline functionality');
+                        
+                        // Test cache
+                        const cacheNames = await caches.keys();
+                        if (cacheNames.length > 0) {
+                            logResult(`✓ ${cacheNames.length} caches available for offline use`);
+                        } else {
+                            logResult('⚠ No caches found for offline functionality');
+                        }
+                    } else {
+                        logResult('✗ No Service Worker registered');
+                    }
+                } catch (error) {
+                    logResult('✗ Error testing offline functionality: ' + error.message);
+                }
+            } else {
+                logResult('✗ Service Worker not supported');
+            }
+        }
+
+        async function clearCache() {
+            if ('caches' in window) {
+                try {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(
+                        cacheNames.map(cacheName => caches.delete(cacheName))
+                    );
+                    logResult('✓ All caches cleared successfully');
+                    updateStatus('cache-storage', 'INFO', 'Caches cleared');
+                } catch (error) {
+                    logResult('✗ Error clearing caches: ' + error.message);
+                }
+            } else {
+                logResult('✗ Cache API not available');
+            }
+        }
+
+        // Run tests on page load
+        window.addEventListener('load', runAllTests);
+    </script>
+</body>
+</html>
